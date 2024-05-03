@@ -29,8 +29,8 @@ namespace Services
         {
             if(_ebookDatabase.ValidateAuthor(autordto))
             {
-                var res = _ebookDatabase.AddAuthor(autordto);
-                return res;
+                var abc = _ebookDatabase.AddAuthor(autordto);
+                return abc;
             }
 
             return null;
