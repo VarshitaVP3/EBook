@@ -22,7 +22,8 @@ namespace Services.Interface
 
         public string DeleteBook(int EbookId);
 
-        public Ebook UpdateEbook(Ebook ebook);
+        //public Ebook UpdateEbook(Ebook ebook);
+        public Ebook UpdateEbook(Ebook ebook , List<int> AuthorList);
 
         public bool ValidateAuthor(AuthorDto authordto);
         public bool ValidateAuthorDetails(Author author);

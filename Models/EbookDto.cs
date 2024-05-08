@@ -32,7 +32,7 @@ namespace Models
         public EbookDto()
         {
             //DateOnly.FromDateTime(DateTime.Now);
-            UpdatedAt = DateTime.Now;
+            //UpdatedAt = DateTime.Now;
             isAvailable = true;
 
         }

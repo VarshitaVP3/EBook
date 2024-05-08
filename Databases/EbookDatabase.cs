@@ -43,8 +43,8 @@ namespace Database
                 Biography = autordto.Biography,
                 BirthDate = autordto.BirthDate,
                 Country = autordto.Country,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = autordto.UpdatedAt,
+                //CreatedAt = DateTime.Now,
+                //UpdatedAt = autordto.UpdatedAt,
                 isActive = autordto.isActive,
                 Email = autordto.Email,
                 ContactInfo = autordto.ContactInfo,
@@ -62,12 +62,12 @@ namespace Database
             command.Parameters.AddWithValue("@Biography", author.Biography);
             command.Parameters.AddWithValue("@BirthDate", author.BirthDate);
             command.Parameters.AddWithValue("@Country", author.Country);
-            command.Parameters.AddWithValue("@UpdatedAt", author.UpdatedAt);
+            //command.Parameters.AddWithValue("@UpdatedAt", author.UpdatedAt);
             command.Parameters.AddWithValue("@isActive", author.isActive);
             command.Parameters.AddWithValue("@Email", author.Email);
             command.Parameters.AddWithValue("ContactInfo", author.ContactInfo);
             command.Parameters.AddWithValue("SocialMedia", author.SocialMedia);
-            command.Parameters.AddWithValue("@CreatedAt", author.CreatedAt);
+            //command.Parameters.AddWithValue("@CreatedAt", author.CreatedAt);
 
             
 
@@ -176,7 +176,7 @@ namespace Database
             command.Parameters.AddWithValue("@LastName" , autordto .LastName);
             command.Parameters.AddWithValue("@Biography" , autordto.Biography);
             command.Parameters.AddWithValue("@Country", autordto.Country);
-            command.Parameters.AddWithValue("@UpdatedAt" , autordto.UpdatedAt);
+            //command.Parameters.AddWithValue("@UpdatedAt" , autordto.UpdatedAt);
             command.Parameters.AddWithValue("@isActive", autordto.isActive);
             command.Parameters.AddWithValue("@Email", autordto.Email);
             command.Parameters.AddWithValue("@ContactInfo" , autordto.ContactInfo);
@@ -303,12 +303,12 @@ namespace Database
                 Publisher = ebookdto.Publisher,
                 PageCount = ebookdto.PageCount,
                 AverageCounting = ebookdto.AverageCounting,
-                UpdatedAt = DateTime.Now,
+                //UpdatedAt = DateTime.Now,
                 isAvailable = ebookdto.isAvailable,
                 edition = ebookdto.edition,
 
                 GenereId = ebookdto.GenereId,
-                CreatedAt = DateTime.Now,
+                //CreatedAt = DateTime.Now,
             };
 
             string query = "InsertIntoEbook";
@@ -327,8 +327,8 @@ namespace Database
             command.Parameters.AddWithValue("@Publisher", ebook.Publisher);
             command.Parameters.AddWithValue("@PageCount", ebook.PageCount);
             command.Parameters.AddWithValue("@AverageCounting", ebook.AverageCounting);
-            command.Parameters.AddWithValue("@CreatedAt", ebook.CreatedAt);
-            command.Parameters.AddWithValue("@UpdatedAt", ebook.UpdatedAt);
+            //command.Parameters.AddWithValue("@CreatedAt", ebook.CreatedAt);
+            //command.Parameters.AddWithValue("@UpdatedAt", ebook.UpdatedAt);
 
             command.Parameters.AddWithValue("@GenereId", ebook.GenereId);
             command.Parameters.AddWithValue("@isAvailable", ebook.isAvailable);
@@ -455,7 +455,48 @@ namespace Database
 
         }
 
-        public Ebook UpdateEbook(Ebook ebook)
+        //public Ebook UpdateEbook(Ebook ebook)
+        //{
+        //    using SqlConnection connection = new SqlConnection(_connectionString);
+        //    connection.Open();
+
+        //    string query = "UpdateBook";
+        //    using SqlCommand command = new SqlCommand(query, connection);
+        //    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+        //    command.Parameters.AddWithValue("@EbookId", ebook.EbookId);
+        //    command.Parameters.AddWithValue("@Name", ebook.Name);
+        //    command.Parameters.AddWithValue("@Description", ebook.Description);
+        //    command.Parameters.AddWithValue("@ISBN", ebook.ISBN);
+        //    command.Parameters.AddWithValue("@PublicationDate", ebook.PublicationDate);
+        //    command.Parameters.AddWithValue("@Price", ebook.Price);
+        //    command.Parameters.AddWithValue("@Language", ebook.Language);
+        //    command.Parameters.AddWithValue("@Publisher", ebook.Publisher);
+        //    command.Parameters.AddWithValue("@PageCount", ebook.PageCount);
+        //    command.Parameters.AddWithValue("@AverageCounting", ebook.AverageCounting);
+        //    //command.Parameters.AddWithValue("@CreatedAt", ebook.CreatedAt);
+        //    //command.Parameters.AddWithValue("@UpdatedAt", ebook.UpdatedAt);
+          
+        //    command.Parameters.AddWithValue("@GenereId", ebook.GenereId);
+        //    command.Parameters.AddWithValue("@isAvailable", ebook.isAvailable);
+        //    command.Parameters.AddWithValue("@edition", ebook.edition);
+
+
+        //    int rowsAffected = command.ExecuteNonQuery();
+
+        //    if (rowsAffected > 0)
+        //    {
+        //        Console.WriteLine("Book found and updated");
+        //        return ebook;
+        //    }
+        //    else
+        //    {
+        //        return null;
+        //    }
+
+        //}
+
+        public Ebook UpdateEbook(Ebook ebook , List<int> AuthorList)
         {
             using SqlConnection connection = new SqlConnection(_connectionString);
             connection.Open();
@@ -474,20 +515,42 @@ namespace Database
             command.Parameters.AddWithValue("@Publisher", ebook.Publisher);
             command.Parameters.AddWithValue("@PageCount", ebook.PageCount);
             command.Parameters.AddWithValue("@AverageCounting", ebook.AverageCounting);
-            command.Parameters.AddWithValue("@CreatedAt", ebook.CreatedAt);
-            command.Parameters.AddWithValue("@UpdatedAt", ebook.UpdatedAt);
-          
+            //command.Parameters.AddWithValue("@CreatedAt", ebook.CreatedAt);
+            //command.Parameters.AddWithValue("@UpdatedAt", ebook.UpdatedAt);
+
             command.Parameters.AddWithValue("@GenereId", ebook.GenereId);
             command.Parameters.AddWithValue("@isAvailable", ebook.isAvailable);
             command.Parameters.AddWithValue("@edition", ebook.edition);
 
+           
 
             int rowsAffected = command.ExecuteNonQuery();
 
             if (rowsAffected > 0)
             {
+                string getEbookIdQuery = "SELECT EbookId from Ebook  where Name = @Name";
+
+
+                SqlCommand getEbookIdCommand = new SqlCommand(getEbookIdQuery, connection);
+                getEbookIdCommand.Parameters.AddWithValue("@Name", ebook.Name);
+                int ebookId = Convert.ToInt32(getEbookIdCommand.ExecuteScalar());
+
+                DataTable authorDataTable = new DataTable();
+                authorDataTable.Columns.Add("AuthorId", typeof(int));
+                foreach (int authorId in AuthorList)
+                {
+                    authorDataTable.Rows.Add(authorId);
+                }
+
+                string mappingQuery = "UpdateInsertintoMapping";
+                using SqlCommand mappingCommand = new SqlCommand(mappingQuery, connection);
+                mappingCommand.CommandType = CommandType.StoredProcedure;
+                mappingCommand.Parameters.AddWithValue("@EbookId", ebookId);
+                mappingCommand.Parameters.AddWithValue("@AuthorGenre", authorDataTable);
+                mappingCommand.ExecuteNonQuery();
+
                 Console.WriteLine("Book found and updated");
-                return ebook;
+               return ebook;
             }
             else
             {
@@ -502,8 +565,10 @@ namespace Database
             {
                 return false;
             }
-            if (!ValidateContactInfo(author.Email))
+            if (!ValidateContactInfo(author.ContactInfo))
             { return false; }
+
+            if(!ValidateEmail(author.Email)) {  return false; }
 
             return true;
 

@@ -114,12 +114,17 @@ namespace EBook.Controllers
 
         [HttpPut]
         [Route("/UpdateBooks")]
-        public IActionResult UpdateBook(int EbookId, [FromBody] Ebook ebook)
+        public IActionResult UpdateBook(int EbookId, [FromBody] Ebook ebook, List<int> AuthorList)
         {
-            var res = _ebookService.UpdateEbook(ebook);
-            if(res != null) { return Ok(res); }
+            //var res = _ebookService.UpdateEbook(ebook);
+            var res = _ebookService.UpdateEbook(ebook, AuthorList);
+            if (res != null) { return Ok(res); }
             return Ok("Entered details are not valid");
         }
+
+
+
+
 
         [HttpGet]
         [Route("/GetBookByName")]

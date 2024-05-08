@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -13,6 +14,8 @@ namespace Models
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Biography { get; set; }
+        [Required]
+        [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Date must be in yyyy-MM-dd format")]
         public DateTime? BirthDate { get; set; }
         public string? Country { get; set; }
         public DateTime? CreatedAt { get; set; }

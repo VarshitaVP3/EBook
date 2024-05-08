@@ -27,25 +27,39 @@ namespace Services
         
         public Author AddAuthor(AuthorDto autordto)
         {
-            if(_ebookDatabase.ValidateAuthor(autordto))
+            try
             {
-                var abc = _ebookDatabase.AddAuthor(autordto);
-                return abc;
+                if (_ebookDatabase.ValidateAuthor(autordto))
+                {
+                    var abc = _ebookDatabase.AddAuthor(autordto);
+                    return abc;
+                }
+                else
+                {
+                    throw new CustomException("Invalid input");
+                }
             }
-
-            return null;
+            catch(CustomException  ex)
+            {
+                throw new Exception("Some error occured", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex.Message}", ex);
+            }
+  
 
         }
 
-        //public Ebook AddEbook(EbookDto ebook)
+        //public Ebook AddEbook(EbookDto ebook , List<int> AuthorList)
         //{
 
 
         //    try
         //    {
-        //        if(_ebookDatabase.ValidateEbookDto(ebook))
+        //        if (_ebookDatabase.ValidateEbookDto(ebook))
         //        {
-        //            var res= _ebookDatabase.AddEbook(ebook);
+        //            var res = _ebookDatabase.AddEbook(ebook,AuthorList);
         //            return res;
         //        }
 
@@ -53,7 +67,7 @@ namespace Services
         //    }
         //    catch (Exception ex)
         //    {
-        //        throw ex; 
+        //        throw ex;
         //    }
         //}
 
@@ -87,7 +101,19 @@ namespace Services
 
         public string DeleteAuthor(int AuthorId)
         {
-            return _ebookDatabase.DeleteAuthor(AuthorId);
+            try
+            {
+                return _ebookDatabase.DeleteAuthor(AuthorId);
+                throw new CustomException("Author deleted");
+            }
+            catch(CustomException ex)
+            {
+                throw new Exception("Unable to delete the author details");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Unable to delete as it has the foreign key reference");
+            }
         }
 
         public List<Author> GetAuthor()
@@ -99,7 +125,7 @@ namespace Services
         {
             try
             {
-                if(_ebookDatabase.ValidateAuthorDetails(autor))
+                if (_ebookDatabase.ValidateAuthorDetails(autor))
                 {
                     var result = _ebookDatabase.UpdateAuthor(autor);
                     return result;
@@ -113,8 +139,7 @@ namespace Services
                 Console.WriteLine("Error occured in updating");
                 return null;
             }
-               
-       
+   
         }
 
         public List<Ebook> GetEbooks()
@@ -127,26 +152,31 @@ namespace Services
             return _ebookDatabase.DeleteBook(EbookId);
         }
 
-        public Ebook UpdateEbook(Ebook ebook)
+        //public Ebook UpdateEbook(Ebook ebook)
+        //{
+        //    try
+        //    {
+        //        if (_ebookDatabase.ValidateEbook(ebook))
+        //        {
+        //            var result = _ebookDatabase.UpdateEbook(ebook);
+        //            return result;
+        //        }
+
+        //        return null;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Error occured in updating");
+        //        return null;
+        //    }
+        //}
+
+        public Ebook UpdateEbook(Ebook ebook , List<int> AuthorList)
         {
-            try
-            {
-                if (_ebookDatabase.ValidateEbook(ebook))
-                {
-                    var result = _ebookDatabase.UpdateEbook(ebook);
-                    return result;
-                }
-
-                return null;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error occured in updating");
-                return null;
-            }
+            var res = _ebookDatabase.UpdateEbook(ebook , AuthorList);
+            return res;
         }
-
         public bool ValidateAuthor(AuthorDto authordto)
         {
             throw new NotImplementedException();

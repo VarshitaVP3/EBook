@@ -34,8 +34,8 @@ namespace Models
         {
             
             //DateOnly.FromDateTime(DateTime.Now);
-            CreatedAt = DateTime.Now;
-            UpdatedAt = DateTime.Now;
+            //CreatedAt = DateTime.Now;
+            //UpdatedAt = DateTime.Now;
             PublicationDate = DateTime.Now;
 
         }
