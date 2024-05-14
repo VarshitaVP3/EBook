@@ -1,33 +1,43 @@
 ﻿using Database;
+using Databases.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
 using Services.Interface;
 using System.Data;
 
+
 namespace EBook.Controllers
 {
+    [Authorize]
     public class EbookController : Controller
     {
         private readonly IEbook _ebookDatabase;
         private readonly IEbook _ebookService;
+        private IAuthService _authService;
 
         //public EbookController(IConfiguration configuration )
         //{
 
         //    //_ebookDatabase = new EbookDatabase();
         //    _ebookService = new EbookServices(configuration);
-          
+
 
         //}
 
-        public EbookController(IEbook EbookService)
+        public EbookController(IEbook EbookService )
         {
             _ebookService = EbookService;
+           
         }
+
+
+      
 
         [HttpGet]
         [Route("/GetAuthor")]
+        [Authorize(Roles ="sde")]
         public IActionResult GetAuthorDetails()
         {
             
@@ -39,13 +49,22 @@ namespace EBook.Controllers
         [Route("/PostAuthor")]
         public IActionResult Index([FromBody] AuthorDto authorDto)
         {
-            
-                var res = _ebookService.AddAuthor(authorDto);
-            if(res!=null)
+            try
             {
-                return Ok(res);
-            }
+                var res = _ebookService.AddAuthor(authorDto);
+                if (res != null)
+                {
+                    return Ok(res);
+                }
                 return Ok("entered details are not valid");
+
+            }
+            
+            catch(UnauthorizedAccessException)
+            {
+                Console.WriteLine("UnAuthorized");
+                return Unauthorized("You dont have the access to the api request");
+            }
             
             
         }

@@ -19,20 +19,7 @@ namespace Database
             using SqlConnection connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            //Ebook ebook = new Ebook()
-            //{
-            //    Name = ebookdto.Name,
-            //    Description = ebookdto.Description,
-            //    ISBN = ebookdto.ISBN,
-            //    Price = ebookdto.Price,
-            //    Language = ebookdto.Language,
-            //    Publisher = ebookdto.Publisher,
-            //    PageCount = ebookdto.PageCount,
-            //    AverageCounting = ebookdto.AverageCounting,
-            //    UpdatedAt = ebookdto.UpdatedAt,
-            //    isAvailable = ebookdto.isAvailable,
-            //    edition = ebookdto.edition,
-            //};
+   
 
             Author author = new Author()
             {
