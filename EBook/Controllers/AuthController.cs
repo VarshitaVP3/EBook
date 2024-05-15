@@ -1,10 +1,12 @@
-﻿using Databases.Interface;
+﻿using Databases;
+using Databases.Interface;
 using EBook.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,15 +16,18 @@ namespace EBook.Controllers
     public class AuthController : Controller
     {
         private IConfiguration _configuration;
-        private IAuthService _authService;
+        
         private readonly string _connectionString;
+        private readonly IAuthService _authService;
+        
 
 
-        public AuthController(IConfiguration configuration, IAuthService auth)
+        public AuthController(IConfiguration configuration, IAuthService AuthService )
         {
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DevConnection");
-            _authService = auth;
+            _authService = AuthService;
+          
 
         }
 
@@ -35,6 +40,7 @@ namespace EBook.Controllers
             try
             {
                 var res = _authService.AddUsers(user);
+                
                 return Ok(res);
             }
             catch( Exception ex)
@@ -73,6 +79,7 @@ namespace EBook.Controllers
         [Route("/Login")]
         public string Login([FromBody] Login login)
         {
+           
             
             var response = _authService.Login(login);
             return response.ToString();
@@ -88,6 +95,10 @@ namespace EBook.Controllers
                 return Ok(res);
             }
             catch ( InValidNameException ex) {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
 

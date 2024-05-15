@@ -15,7 +15,7 @@ namespace EBook.Controllers
     {
         private readonly IEbook _ebookDatabase;
         private readonly IEbook _ebookService;
-        private IAuthService _authService;
+       
 
         //public EbookController(IConfiguration configuration )
         //{

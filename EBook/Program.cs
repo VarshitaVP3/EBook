@@ -1,4 +1,5 @@
 using Database;
+using Databases;
 using Databases.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -30,9 +31,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<EbookDatabase>();  
+builder.Services.AddScoped<AuthDatabase>();
 builder.Services.AddScoped<IEbook, EbookDatabase>();
 builder.Services.AddScoped<IEbook,EbookServices>();
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthDatabase>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
