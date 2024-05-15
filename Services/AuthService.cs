@@ -4,13 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Models;
-using System;
-using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -29,6 +27,19 @@ namespace Services
 
         }
 
+        private string GenerateToken(Users user)
+        {
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], null,
+                expires: DateTime.Now.AddMinutes(1),
+                signingCredentials: credentials
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         public Users AddUsers(UserDto user)
         {
             using SqlConnection connection = new SqlConnection(_connectionString);
@@ -41,7 +52,7 @@ namespace Services
             {
                 Username = user.Username,
                 Password = hashedPassword,
-                UserRole = user.UserRole
+                UserRole = Role.User.ToString(),
 
             };
 
@@ -52,19 +63,36 @@ namespace Services
 
             command.Parameters.AddWithValue("@Username", users.Username);
             command.Parameters.AddWithValue("@Password", hashedPassword);
-            command.Parameters.AddWithValue("@UserRole", users.UserRole);
+            command.Parameters.AddWithValue("@UserRole", Role.User.ToString());
 
-            int rowsAffected = command.ExecuteNonQuery();
-
-            if (rowsAffected > 0)
-            {
-                return users;
-            }
-            else
+            try
             {
 
-                return null;
+                int rowsAffected = command.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    return users;
+                }
+                else
+                {
+
+                    return null;
+                }
+
             }
+
+            catch (SqlException ex)
+            {
+                if(ex.Number == 2627)
+                {
+                    throw new Exception("User already exits");
+                }
+
+               
+            }
+
+            return null;
 
         }
 
@@ -88,14 +116,41 @@ namespace Services
 
       
 
-        public Users Authentication(string username, string password)
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        public bool IsAdmin(string username)
+        public string IsAdmin(string username)
         {
-            throw new NotImplementedException();
+            try
+            {
+
+                if (username!.IsNullOrEmpty())
+                {
+                    throw new Exception("");
+                }
+
+                using SqlConnection connection = new SqlConnection(_connectionString);
+                connection.Open();
+
+                string query = "CheckAdmin";
+                using SqlCommand command = new SqlCommand(query, connection);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                command.Parameters.AddWithValue("@Username", username);
+
+                // Add output parameter to get the result
+                var outputParameter = command.Parameters.Add("@IsAdmin", SqlDbType.VarChar, 20);
+                outputParameter.Direction = ParameterDirection.Output;
+
+                command.ExecuteNonQuery();
+
+                return outputParameter.Value.ToString();
+            }
+            catch ( Exception ex)
+            {
+                throw new Exception("Invalid name");
+            }
+
+            
         }
 
         public string Login(Login login)
@@ -103,42 +158,31 @@ namespace Services
             using SqlConnection connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            // string hashedPassword = HashPassword(login.Password);
-
-            string querys = "HashPassword";
+            string querys = "HashPasswordAndRole";
             using SqlCommand commands = new SqlCommand(querys, connection);
             commands.CommandType = System.Data.CommandType.StoredProcedure;
-
             commands.Parameters.AddWithValue("@Username", login.Username);
 
-            string hash = commands.ExecuteScalar() as string;
-
-
-            if (BCrypt.Net.BCrypt.EnhancedVerify(login.Password, hash))
+            using SqlDataReader reader = commands.ExecuteReader();
+            if (reader.Read())
             {
+                string passwordFromDb = reader["Password"].ToString();
+                string userRole = reader["UserRole"].ToString();
 
-                string query = "SELECT Username, UserRole FROM Users WHERE Username = @Username AND Password = @Password;";
-                using SqlCommand command = new SqlCommand(query, connection);
+            
 
-                command.Parameters.AddWithValue("@Username", login.Username);
-                command.Parameters.AddWithValue("@Password", hash);
-
-
-                using SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                // Verify the hashed password from the database
+                if (BCrypt.Net.BCrypt.EnhancedVerify(login.Password, passwordFromDb))
                 {
-                    string username = reader["Username"].ToString();
-                    string userRole = reader["UserRole"].ToString();
 
                     var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appsetting.Key));
                     var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 
-                    var token = new JwtSecurityToken(_appsetting.Issuer, _appsetting.Audience
-                       ,
+                    var token = new JwtSecurityToken(_appsetting.Issuer, _appsetting.Audience,
                         new[]
                         {
-                        new Claim(ClaimTypes.Name, username),
-                        new Claim(ClaimTypes.Role, userRole)
+                    new Claim(ClaimTypes.Name, login.Username),
+                    new Claim(ClaimTypes.Role, userRole)
                         },
                         expires: DateTime.Now.AddMinutes(1),
                         signingCredentials: credentials
@@ -146,11 +190,68 @@ namespace Services
 
                     return new JwtSecurityTokenHandler().WriteToken(token);
                 }
-
             }
-
 
             return null;
         }
+
+        public Users AddAdmin(UserDto user)
+        {
+            using SqlConnection connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            //string hashedPassword = HashPassword(user.Password);
+            string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 13);
+
+            Users users = new Users()
+            {
+                Username = user.Username,
+                Password = hashedPassword,
+                UserRole = Role.Admin.ToString(),
+
+            };
+
+            string query = "InsertUser";
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+
+            command.Parameters.AddWithValue("@Username", users.Username);
+            command.Parameters.AddWithValue("@Password", hashedPassword);
+            command.Parameters.AddWithValue("@UserRole", Role.Admin.ToString());
+
+            try
+            {
+
+                int rowsAffected = command.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    return users;
+                }
+                else
+                {
+
+                    return null;
+                }
+
+            }
+
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    throw new Exception("User name  already exits");
+                }
+
+
+            }
+
+            return null;
+        }
+
+        
     }
+
+   
 }

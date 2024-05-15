@@ -19,6 +19,12 @@ namespace EBook.Controllers
         [Authorize()] 
         public string LoginDetails( [FromBody] Login login)
         {
+            var user = HttpContext.Items["User"];
+            if (user == null)
+            {
+                Console.WriteLine("Permission denied");
+                return "Unauthorized";
+            }
             return "varhsita";
         }
     }

@@ -15,3 +15,9 @@ namespace Models
         public string UserRole { get; set; }
     }
 }
+
+public enum Role
+{
+    User , 
+    Admin
+}

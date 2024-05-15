@@ -10,12 +10,11 @@ namespace Databases.Interface
     public interface IAuthService
     {
         Users AddUsers(UserDto user);
-        
 
         string Login(Login login);
 
+        Users AddAdmin(UserDto user);
 
-        Users Authentication(string username, string password);
-        bool IsAdmin(string username);
+        string IsAdmin(string username);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Databases.Interface;
+using EBook.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -30,8 +32,15 @@ namespace EBook.Controllers
         [Route("/SignUp")]
         public IActionResult AddUsers([FromBody] UserDto user)
         {
-            var res = _authService.AddUsers(user);
-            return Ok(res);
+            try
+            {
+                var res = _authService.AddUsers(user);
+                return Ok(res);
+            }
+            catch( Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         private string GenerateToken(Users user)
@@ -68,6 +77,38 @@ namespace EBook.Controllers
             var response = _authService.Login(login);
             return response.ToString();
         }
+
+        [HttpPost]
+        [Route("/IsAdmin")]
+        public IActionResult GetAdmin([FromBody] string Username)
+        {
+            try
+            {
+                var res = _authService.IsAdmin(Username);
+                return Ok(res);
+            }
+            catch ( InValidNameException ex) {
+                return BadRequest(ex.Message);
+            }
+
+            
+        }
+
+        [HttpPost]
+        [Route("/AddAdmin")]
+        public IActionResult AddAdmin([FromBody] UserDto user )
+        {
+            try
+            {
+                var res = _authService.AddAdmin(user);
+                return Ok(res);
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
 
     }

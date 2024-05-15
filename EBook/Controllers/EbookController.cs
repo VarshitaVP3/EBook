@@ -10,7 +10,7 @@ using System.Data;
 
 namespace EBook.Controllers
 {
-    [Authorize]
+    [Authorize()]
     public class EbookController : Controller
     {
         private readonly IEbook _ebookDatabase;
@@ -37,7 +37,7 @@ namespace EBook.Controllers
 
         [HttpGet]
         [Route("/GetAuthor")]
-        [Authorize(Roles ="sde")]
+        
         public IActionResult GetAuthorDetails()
         {
             
@@ -47,6 +47,7 @@ namespace EBook.Controllers
 
         [HttpPost]
         [Route("/PostAuthor")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Index([FromBody] AuthorDto authorDto)
         {
             try
@@ -71,6 +72,7 @@ namespace EBook.Controllers
 
         [HttpDelete]
         [Route("/DeleteAuthor")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int AuthorId )
         {
             string result = _ebookService.DeleteAuthor(AuthorId);
@@ -80,6 +82,7 @@ namespace EBook.Controllers
 
         [HttpPut]
         [Route("/EditAuthor")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int AuthorId , [FromBody] Author author )
         {
  
@@ -97,21 +100,9 @@ namespace EBook.Controllers
             return Ok(res);
         }
 
-        //[HttpPost]
-        //[Route("/AddBook")]
-        //public IActionResult AddBook([FromBody] EbookDto ebookDto , List<int> AuthorList)
-        //{
-
-        //    var result = _ebookService.AddEbook(ebookDto);
-        //    if(result != null)
-        //    {
-        //        return Ok(result);
-        //    }
-        //    return Ok("Entered details are invalid");  
-        //}
-
         [HttpPost]
         [Route("/AddBook")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddBook([FromBody] EbookDto ebookDto, List<int> AuthorList)
         {
             var result = _ebookService.AddEbook(ebookDto, AuthorList);
@@ -133,6 +124,7 @@ namespace EBook.Controllers
 
         [HttpPut]
         [Route("/UpdateBooks")]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateBook(int EbookId, [FromBody] Ebook ebook, List<int> AuthorList)
         {
             //var res = _ebookService.UpdateEbook(ebook);
