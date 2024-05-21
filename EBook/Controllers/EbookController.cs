@@ -10,7 +10,7 @@ using System.Data;
 
 namespace EBook.Controllers
 {
-    [Authorize()]
+    //[Authorize()]
     public class EbookController : Controller
     {
         private readonly IEbook _ebookDatabase;
@@ -47,7 +47,7 @@ namespace EBook.Controllers
 
         [HttpPost]
         [Route("/PostAuthor")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public IActionResult Index([FromBody] AuthorDto authorDto)
         {
             try

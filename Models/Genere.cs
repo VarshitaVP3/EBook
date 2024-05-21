@@ -11,5 +11,6 @@ namespace Models
         public int GenereId { get; set; }
         public string GenereName { get; set;}
         public string GenereDescription { get; set;}
+        public ICollection<Ebook> Ebooks { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Models
@@ -29,6 +30,11 @@ namespace Models
 
         public string edition {  get; set; }
 
+        [JsonIgnore]
+        public Genere Genere { get; set; }
+
+        public ICollection<AuthorEbook> AuthorEbooks { get; set; } = new List<AuthorEbook>();
+
 
         public Ebook()
         {
@@ -36,6 +42,7 @@ namespace Models
             //DateOnly.FromDateTime(DateTime.Now);
             //CreatedAt = DateTime.Now;
             //UpdatedAt = DateTime.Now;
+            isAvailable = true;
             PublicationDate = DateTime.Now;
 
         }

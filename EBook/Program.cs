@@ -1,7 +1,9 @@
 using Database;
 using Databases;
 using Databases.Interface;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
@@ -27,6 +29,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 
+//builder.Services.AddDbContext<EbookDbContext>
+//    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+builder.Services.AddDbContext<EbookDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"), b => b.MigrationsAssembly("EBook")));
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -36,6 +44,9 @@ builder.Services.AddScoped<IEbook, EbookDatabase>();
 builder.Services.AddScoped<IEbook,EbookServices>();
 builder.Services.AddScoped<IAuthService, AuthDatabase>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<EbookDbService>();
+builder.Services.AddScoped<IDatabase, EbookDbService>();    
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -92,14 +103,21 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    //app.UseExceptionHandler("/error");
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
     });
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
