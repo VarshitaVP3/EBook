@@ -16,10 +16,6 @@ namespace Services
     {
         public IEbook _ebookDatabase;
 
-        //public EbookServices(IConfiguration configuration) {
-        //    _ebookDatabase = new EbookDatabase(configuration);
-        //}
-
         public EbookServices(EbookDatabase ebookDatabase)
         {
             _ebookDatabase = ebookDatabase;
@@ -50,26 +46,6 @@ namespace Services
   
 
         }
-
-        //public Ebook AddEbook(EbookDto ebook , List<int> AuthorList)
-        //{
-
-
-        //    try
-        //    {
-        //        if (_ebookDatabase.ValidateEbookDto(ebook))
-        //        {
-        //            var res = _ebookDatabase.AddEbook(ebook,AuthorList);
-        //            return res;
-        //        }
-
-        //        return null;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
 
         public Ebook AddEbook(EbookDto ebookDto, List<int> AuthorList)
         {
@@ -152,25 +128,6 @@ namespace Services
             return _ebookDatabase.DeleteBook(EbookId);
         }
 
-        //public Ebook UpdateEbook(Ebook ebook)
-        //{
-        //    try
-        //    {
-        //        if (_ebookDatabase.ValidateEbook(ebook))
-        //        {
-        //            var result = _ebookDatabase.UpdateEbook(ebook);
-        //            return result;
-        //        }
-
-        //        return null;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("Error occured in updating");
-        //        return null;
-        //    }
-        //}
 
         public Ebook UpdateEbook(Ebook ebook , List<int> AuthorList)
         {

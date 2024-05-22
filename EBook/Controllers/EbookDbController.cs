@@ -74,5 +74,39 @@ namespace EBook.Controllers
             var res = _ebookDbService.DeleteEbook(EbookId);
             return Ok(res);
         }
+
+        [HttpGet("GetEbookByTitle")]
+        public IActionResult GetEbooksByTitlename(string Titlename)
+        {
+            var res = _ebookDbService.SearchEbookByTitle(Titlename);
+            return Ok(res);
+        }
+
+        [HttpGet("/SearchEbookByGenere")]
+        public IActionResult SearchBookByGenere(string Genere)
+        {
+            var r = _ebookDbService.SearchEbooksByGenre(Genere);
+            return Ok(r);
+        }
+
+        [HttpGet("/SearchEbooksByLanguage")]
+        public IActionResult SearchEbook(string Language)
+        {
+            var res = _ebookDbService.SearchEbooksByLanguage(Language);
+            return Ok(res);
+        }
+
+        [HttpGet("/SearchAuthorByBook")]
+        public IActionResult actionResult(string BookName) {
+            var authorList = _ebookDbService.SearchAuthorByBook(BookName);
+            return Ok(authorList);
+        }
+
+        [HttpGet]
+        public IActionResult Search(string AuthorName)
+        {
+            var bookList = _ebookDbService.SearchBookByAuthorName(AuthorName);
+            return Ok(bookList);
+        }
     }
 }

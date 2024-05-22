@@ -20,5 +20,12 @@ namespace Databases.Interface
         public Ebook UpdateEbook(int EbookId, EbookDto ebookDto);
 
         public string DeleteEbook(int EbookId);
+        public List<Ebook> SearchEbookByTitle(string Title);
+        public List<Ebook> SearchEbooksByGenre(string genreName);
+        public List<string> SearchEbooksByLanguage(string Language);
+
+        public List<string> SearchAuthorByBook(string bookName);
+
+        public List<string> SearchBookByAuthorName(string authorName);
     }
 }
